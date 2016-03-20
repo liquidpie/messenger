@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.vivek.rest.jersey.messenger.database.DatabaseStub;
+import com.vivek.rest.jersey.messenger.exception.DataNotFoundException;
 import com.vivek.rest.jersey.messenger.model.Message;
 
 public class MessageService {
@@ -51,7 +52,11 @@ public class MessageService {
 	}
 	
 	public Message getMessage(long id) {
-		return messages.get(id);
+		Message message = messages.get(id);
+		if (message == null) {
+			throw new DataNotFoundException("Message with id " + id + " not found");
+		}
+		return message;
 	}
 	
 	public Message addMessage(Message message) {

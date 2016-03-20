@@ -58,7 +58,7 @@ public class MessageResource {
 				.entity(message)
 				.build();
 		
-////		return messageService.addMessage(message);
+//		return messageService.addMessage(message);
 	}
 	
 	@DELETE
