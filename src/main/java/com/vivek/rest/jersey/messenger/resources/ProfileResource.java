@@ -16,33 +16,30 @@ import com.vivek.rest.jersey.messenger.model.Profile;
 import com.vivek.rest.jersey.messenger.service.ProfileService;
 
 @Path("/profiles")
+@Produces(value = {MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 public class ProfileResource {
 	
 	ProfileService profileService = new ProfileService();
 	
 	@GET
-	@Produces(MediaType.APPLICATION_JSON)
 	public List<Profile> getAllProfiles() {
 		return profileService.getAllProfiles();
 	}
 	
 	@GET
 	@Path("/{name}")
-	@Produces(MediaType.APPLICATION_JSON)
 	public Profile getProfile(@PathParam("name") String name) {
 		return profileService.getProfile(name);
 	}
 	
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
 	public Profile addProfile(Profile profile) {
 		return profileService.addProfile(profile);
 	}
 	
 	@DELETE
 	@Path("/{name}")
-	@Produces(MediaType.APPLICATION_JSON)
 	public void removeProfile(@PathParam("name") String name) {
 		profileService.removeProfile(name);
 	}
@@ -50,7 +47,6 @@ public class ProfileResource {
 	@PUT
 	@Path("/{name}")
 	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
 	public Profile updateMessage(@PathParam("name") String name, Profile profile) {
 		profile.setProfileName(name);
 		return profileService.updateProfile(profile);

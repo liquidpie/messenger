@@ -22,12 +22,12 @@ import com.vivek.rest.jersey.messenger.resources.beans.MessageFilterBean;
 import com.vivek.rest.jersey.messenger.service.MessageService;
 
 @Path("/messages")
+@Produces(value = {MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 public class MessageResource {
 	
 	MessageService messageService = new MessageService();
 	
 	@GET
-	@Produces(MediaType.APPLICATION_JSON)
 	public List<Message> getAllMessages(@BeanParam MessageFilterBean filterBean) {
 		if (filterBean.getYear() > 0) {
 			return messageService.getAllMessagesForYear(filterBean.getYear());
@@ -40,14 +40,44 @@ public class MessageResource {
 	
 	@GET
 	@Path("/{id}")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Message getMessage(@PathParam("id") long id) {
-		return messageService.getMessage(id);
+	public Message getMessage(@PathParam("id") long id, @Context UriInfo uriInfo) {
+		Message message = messageService.getMessage(id);
+		
+		message.addLink(getUriForSelf(uriInfo, message), "self");
+		message.addLink(getUriForProfile(uriInfo, message), "profile");
+		message.addLink(getUriForComments(uriInfo, message), "comments");
+		return message;
+		
+	}
+	
+	private String getUriForComments(UriInfo uriInfo, Message message) {
+		return uriInfo.getBaseUriBuilder()
+							.path(MessageResource.class)
+							.path(MessageResource.class, "getCommentResource")
+							.path(CommentResource.class)
+							.resolveTemplate("id", message.getId())
+							.build()
+							.toString();
+	}
+
+	private String getUriForProfile(UriInfo uriInfo, Message message) {
+		return uriInfo.getBaseUriBuilder()
+							.path(ProfileResource.class)
+							.path(message.getAuthor())
+							.build()
+							.toString();
+	}
+
+	private String getUriForSelf(UriInfo uriInfo, Message message) {
+		return uriInfo.getBaseUriBuilder()
+							.path(MessageResource.class)
+							.path(Long.toString(message.getId()))
+							.build()
+							.toString();
 	}
 	
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
 	public Response addMessage(Message message, @Context UriInfo uriInfo) {
 		String id = String.valueOf(message.getId());
 		URI uriPath = uriInfo.getAbsolutePathBuilder()
@@ -63,7 +93,6 @@ public class MessageResource {
 	
 	@DELETE
 	@Path("/{id}")
-	@Produces(MediaType.APPLICATION_JSON)
 	public void removeMessage(@PathParam("id") long id) {
 		messageService.removeMessage(id);
 	}
@@ -71,7 +100,6 @@ public class MessageResource {
 	@PUT
 	@Path("/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
 	public Message updateMessage(@PathParam("id") long id, Message message) {
 		message.setId(id);
 		return messageService.updateMessage(message);

@@ -1,6 +1,8 @@
 package com.vivek.rest.jersey.messenger.model;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -12,6 +14,8 @@ public class Profile {
 	private String firstName;
 	private String lastName;
 	private Date created;
+	
+	private List<Link> links = new ArrayList<Link>();
 	
 	public Profile() {
 		
@@ -63,6 +67,21 @@ public class Profile {
 
 	public void setCreated(Date created) {
 		this.created = created;
+	}
+
+	public List<Link> getLinks() {
+		return links;
+	}
+
+	public void setLinks(List<Link> links) {
+		this.links = links;
+	}
+	
+	public void addLink(String uri, String rel) {
+		Link link = new Link();
+		link.setLink(uri);
+		link.setRel(rel);
+		links.add(link);
 	}
 
 }
